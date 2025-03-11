@@ -5,8 +5,8 @@ from PIL import Image, ImageDraw
 import face_recognition
 
 # Load the image
-input_path = "./passportphotos/passport7.jpg"
-output_path = "./passportphotos/p7out.png"
+input_path = "./partyphotos/party6.jpg"
+output_path = "./partyphotos/party6out.png"
 
 # Load image with face_recognition
 image = face_recognition.load_image_file(input_path)
