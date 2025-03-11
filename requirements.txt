@@ -1,11 +1,8 @@
-dlib-bin
-numpy
-scipy
-opencv
+dblib-bin
 face_recognition
 torch
 torchvision 
-numpy 
+numpy
 opencv-python 
 pillow 
 rembg
