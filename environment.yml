@@ -1,15 +1,15 @@
 channels:
      - conda-forge
- dependencies:
-     - dlib
-     - numpy
-     - scipy
-     - opencv
-     - face_recognition
-     - torch
-     - torchvision 
-     - numpy 
-     - opencv-python 
-     - pillow 
-     - rembg
-     - streamlit
+dependencies:
+    - dlib
+    - numpy
+    - scipy
+    - opencv
+    - face_recognition
+    - torch
+    - torchvision 
+    - numpy 
+    - opencv-python 
+    - pillow 
+    - rembg
+    - streamlit
