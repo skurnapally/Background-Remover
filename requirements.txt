@@ -1,4 +1,4 @@
-dblib-bin
+dlib-bin
 face_recognition
 torch
 torchvision 
