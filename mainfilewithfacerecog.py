@@ -3,14 +3,9 @@ import numpy as np
 from rembg import remove
 from PIL import Image, ImageDraw
 import face_recognition
+import os
 
 # Load the image
-input_path = "./partyphotos/party6.jpg"
-output_path = "./partyphotos/party6out.png"
-
-# Load image with face_recognition
-image = face_recognition.load_image_file(input_path)
-face_locations = face_recognition.face_locations(image)
 colors_rgb = {
     "White": (255, 255, 255),
     "Black": (0, 0, 0),
@@ -46,42 +41,59 @@ colors_rgb = {
     "Orchid": (218, 112, 214),
     "Hot Pink": (255, 105, 180)
 }
-if not face_locations:
-    print("No face detected!")
-else:
-    # Get the first detected face (top, right, bottom, left)
-    top, right, bottom, left = face_locations[0]
 
-    # Add some padding around the face
-    padding = 200  # Adjust this as needed
-    height, width, _ = image.shape
+for input_folder, output_folder in zip(["partyphotos","passportphotos"],["partyphotosout","passportphotosout"]):
+    # Create output folder if it doesn't exist
+    os.makedirs(output_folder, exist_ok=True)
+    # Get all image files from the folder
+    image_files = [f for f in os.listdir(input_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    for i in image_files:
+        # Load the input image
+        input_path = input_folder+'/'+i
+        output_path = (output_folder+'/'+i).replace(".jpg",".png")
+        # Load image with face_recognition
+        image = face_recognition.load_image_file(input_path)
+        face_locations = face_recognition.face_locations(image)
 
-    top = max(0, top - padding)
-    bottom = min(height, bottom + padding)
-    left = max(0, left - padding)
-    right = min(width, right + padding)
+        if not face_locations:
+            print("No face detected!")
+        else:
+            # Get the first detected face (top, right, bottom, left)
+            top, right, bottom, left = face_locations[0]
 
-    # Crop the image around the face
-    cropped_image = Image.fromarray(image[top:bottom, left:right])
+            # Add some padding around the face
+            padding = 200  # Adjust this as needed
+            height, width, _ = image.shape
 
-    # Remove background
-    output = remove(cropped_image)
+            top = max(0, top - padding)
+            bottom = min(height, bottom + padding)
+            left = max(0, left - padding)
+            right = min(width, right + padding)
 
-    # Create a square canvas based on the cropped face size
-    size = max(output.size)  # Get max dimension to make it square
-    square_img = Image.new("RGBA", (size, size), (255, 255, 255, 255))  # Transparent background
-    square_img.paste(output, ((size - output.width) // 2, (size - output.height) // 2), output)
+            # Crop the image around the face
+            cropped_image = Image.fromarray(image[top:bottom, left:right])
 
-    # Create a circular mask
-    mask = Image.new("L", (size, size), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, size, size), fill=255)  # Create a circular mask
+            # Remove background
+            output = remove(cropped_image)
 
-    # Apply the circular mask
-    round_img = Image.new("RGBA", (size, size), (255, 255, 255, 0))  # Transparent background
-    round_img.paste(square_img, (0, 0), mask)
+            # Create a square canvas based on the cropped face size
+            size = max(output.size)  # Get max dimension to make it square
+            square_img = Image.new("RGBA", (size, size), colors_rgb['White'])  # Transparent background
+            square_img.paste(output, ((size - output.width) // 2, (size - output.height) // 2), output)
 
-    # Save the final round image
-    round_img.save(output_path)
+            # Create a circular mask
+            mask = Image.new("L", (size, size), 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((0, 0, size, size), fill=255)  # Create a circular mask
 
-    print("Round profile picture saved successfully!")
+            # Apply the circular mask
+            round_img = Image.new("RGBA", (size, size), (255, 255, 255, 0))  # Transparent background
+            round_img.paste(square_img, (0, 0), mask)
+
+            # Show the processed image before saving
+            round_img.show(title="Processed Image")
+
+            # Save the final round image
+            round_img.save(output_path)
+
+            print("Round profile picture saved successfully!")

@@ -1,12 +1,8 @@
 from rembg import remove
 from PIL import Image,ImageOps,ImageDraw
+import os
 
-# Load the input image
-input_path = "test9.jpg"
-output_path = "test9out.png"
 
-img = Image.open(input_path)
-output = remove(img)  # Remove background
 colors_rgb = {
     "White": (255, 255, 255),
     "Black": (0, 0, 0),
@@ -58,21 +54,39 @@ if is_Background_color:
 else:
     output.save(output_path)  # Save the result
 '''
-# Create a square canvas (resize to fit)
-size = max(output.size)  # Get the largest dimension
-square_img = Image.new("RGBA", (size, size), colors_rgb[color])  # Transparent background
-square_img.paste(output, ((size - output.width) // 2, (size - output.height) // 2), output)
+# Path to your folder containing images
+for input_folder, output_folder in zip(["partyphotos","passportphotos"],["partyphotosout","passportphotosout"]):
+    # Create output folder if it doesn't exist
+    os.makedirs(output_folder, exist_ok=True)
+    # Get all image files from the folder
+    image_files = [f for f in os.listdir(input_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    for i in image_files:
+        # Load the input image
+        input_path = input_folder+'/'+i
+        output_path = (output_folder+'/'+i).replace(".jpg",".png")
 
-# Create a circular mask
-mask = Image.new("L", (size, size), 0)
-draw = ImageDraw.Draw(mask)
-draw.ellipse((0, 0, size, size), fill=255)  # Draw a circle
+        img = Image.open(input_path)
+        output = remove(img)  # Remove background
 
-# Apply the circular mask
-round_img = Image.new("RGBA", (size, size), colors_rgb[color])  # Transparent background
-round_img.paste(square_img, (0, 0), mask)
+        # Create a square canvas (resize to fit)
+        size = max(output.size)  # Get the largest dimension
+        square_img = Image.new("RGBA", (size, size), colors_rgb[color])  # Transparent background
+        square_img.paste(output, ((size - output.width) // 2, (size - output.height) // 2), output)
 
-# Save the final round image
-round_img.save(output_path)
+        # Create a circular mask
+        mask = Image.new("L", (size, size), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, size, size), fill=255)  # Draw a circle
 
-print("Round profile picture saved successfully!")
+        # Apply the circular mask
+        round_img = Image.new("RGBA", (size, size), colors_rgb[color])  # Transparent background
+        round_img.paste(square_img, (0, 0), mask)
+
+        # Show the processed image before saving
+        round_img.show(title="Processed Image")
+
+        # Save the final round image
+        round_img.save(output_path)
+
+        print("Round profile picture saved successfully!")
+        
