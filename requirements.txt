@@ -2,7 +2,7 @@ face_recognition @ git+https://github.com/thetoby9944/face_recognition
 torch
 torchvision 
 numpy
-opencv-python-headless==4.5.3.56
+opencv-python-headless
 #opencv-python
 pillow 
 rembg
