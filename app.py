@@ -79,7 +79,7 @@ def process_image(img):
     draw = ImageDraw.Draw(mask)
     draw.ellipse((0, 0, size, size), fill=255)
 
-    round_img = Image.new("RGBA", (size, size), colors_rgb[bg_color])
+    round_img = Image.new("RGBA", (size, size), colors_rgb['White'])
     round_img.paste(square_img, (0, 0), mask)
     return round_img
 
@@ -88,7 +88,7 @@ if input_method == "Upload Your Own Photo":
     
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
-        
+        orig_img =  Image.open(uploaded_file)
         if mode == "With Face Detection":
             image = face_recognition.load_image_file(uploaded_file)
             face_locations = face_recognition.face_locations(image)
@@ -104,7 +104,7 @@ if input_method == "Upload Your Own Photo":
         
         col1, col2 = st.columns(2)
         with col1:
-            st.image(img, caption="Original Image", use_container_width=True)
+            st.image(orig_img, caption="Original Image", use_container_width=True)
         with col2:
             st.image(round_img, caption="Processed Image", use_container_width=True)
 
@@ -121,11 +121,21 @@ elif input_method == "Generate Samples":
             input_path = os.path.join(folder, image_file)
             output_path = os.path.join(output_folder, image_file.replace(".jpg", ".png"))
             img = Image.open(input_path)
+            orig_img =  Image.open(input_path)
+            if mode == "With Face Detection":
+                image = face_recognition.load_image_file(input_path)
+                face_locations = face_recognition.face_locations(image)
+                if face_locations:
+                    top, right, bottom, left = face_locations[0]
+                    padding = 200
+                    height, width, _ = image.shape
+                    top, bottom = max(0, top - padding), min(height, bottom + padding)
+                    left, right = max(0, left - padding), min(width, right + padding)
+                    img = Image.fromarray(image[top:bottom, left:right])
             round_img = process_image(img)
             round_img.save(output_path)
-            
             col1, col2 = st.columns(2)
             with col1:
-                st.image(img, caption=f"Original: {image_file}", use_container_width=True)
+                st.image(orig_img, caption=f"Original: {image_file}", use_container_width=True)
             with col2:
                 st.image(round_img, caption=f"Processed: {image_file}", use_container_width=True)
